@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "transformableitems",
-	"version": "1.1.1",
+	"version": "1.2",
 	"name": "Transformable Items",
 	"description": "Lets you move and resize held items",
 	"authors": [
