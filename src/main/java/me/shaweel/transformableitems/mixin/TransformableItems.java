@@ -1,15 +1,16 @@
 package me.shaweel.transformableitems.mixin;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.FirstPersonHandsAndItemsRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.client.renderer.state.level.FirstPersonHandsAndItemsRenderState;
+import net.minecraft.client.renderer.state.level.PlayerRenderState;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,33 +20,57 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import me.shaweel.transformableitems.ConfigFile;
 import me.shaweel.transformableitems.ConfigFile.TabConfig;
 
-@Mixin(ItemInHandRenderer.class)
+@Mixin(FirstPersonHandsAndItemsRenderer.class)
 public class TransformableItems {
-	@Shadow private float mainHandHeight;
-	@Shadow private float offHandHeight;
-	@Shadow private float oMainHandHeight;
-	@Shadow private float oOffHandHeight;
-	@Shadow private ItemStack mainHandItem;
-	@Shadow private ItemStack offHandItem;
-	
-	private boolean isEating(LivingEntity livingEntity) {
-		return livingEntity.isUsingItem() && livingEntity.getUseItem().getUseAnimation() == ItemUseAnimation.EAT;
+	private boolean isEating(PlayerRenderState playerState, ItemStack itemStack) {
+		return playerState.avatarRenderState.isUsingItem && itemStack.getUseAnimation() == ItemUseAnimation.EAT;
 	}
 
-	@Inject(method = "renderItem", at = @At("HEAD"))
+	private boolean isLeftHand(PlayerRenderState playerState, InteractionHand hand) {
+		boolean leftHanded = playerState.avatarRenderState.mainArm == HumanoidArm.LEFT;
+		boolean leftHand = hand.equals(InteractionHand.OFF_HAND);
+		if (leftHanded) {
+			leftHand = !leftHand;
+		}
+
+		return leftHand;
+	}
+
+	@Inject(
+		method = "submitArmWithItem",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/item/ItemStackRenderState;submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;II I)V",
+			ordinal = 1
+		)
+	)
 	private void transform(
-		LivingEntity livingEntity,
+		PlayerRenderState playerState,
+		FirstPersonHandsAndItemsRenderState state,
+		float partialTicks,
+		float xRot,
+		InteractionHand hand,
+		float attack,
 		ItemStack itemStack,
-		ItemDisplayContext itemDisplayContext,
+		float inverseArmHeight,
 		PoseStack poseStack,
 		SubmitNodeCollector submitNodeCollector,
-		int i,
+		int lightCoords,
 		CallbackInfo callbackInfo
 	) {
-		int index = isEating(livingEntity) ? 1 : 0;
+		if (!ConfigFile.configData.itemHeightAnimations) {
+			state.mainHandHeight = 1;
+			state.oldMainHandHeight = 1;
+			state.offHandHeight = 1;
+			state.oldOffHandHeight = 1;
+			state.mainHandItem = Minecraft.getInstance().player.getMainHandItem();
+			state.offHandItem = Minecraft.getInstance().player.getOffhandItem();
+		}
+
+		int index = isEating(playerState, itemStack) ? 1 : 0;
 		TabConfig tabConfig = ConfigFile.configData.get(index);
 
-		if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+		if (isLeftHand(playerState, hand)) {
 			poseStack.translate(
 				tabConfig.xOffset,
 				tabConfig.yOffset,
@@ -58,7 +83,7 @@ public class TransformableItems {
 				tabConfig.zScale
 			);
 
-		} else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
+		} else {
 			poseStack.translate(
 				tabConfig.xOffset * -1,
 				tabConfig.yOffset,
@@ -70,22 +95,34 @@ public class TransformableItems {
 				tabConfig.yScale,
 				tabConfig.zScale
 			);
-		} else {
-			return;
 		}
 	}
 
-	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-	private void tick(CallbackInfo callbackInfo) {
-		if (ConfigFile.configData.itemHeightAnimations) return;
-		oMainHandHeight = 1f;
-		oOffHandHeight = 1f;
-		mainHandHeight = 1f;
-		offHandHeight = 1f;
+	@Inject(method = "submitHandsWithItems", at = @At("HEAD"))
+	private void disableItemHeightAnimations(
+		float partialTicks,
+		PoseStack poseStack,
+		SubmitNodeCollector submitNodeCollector,
+		PlayerRenderState playerState,
+		FirstPersonHandsAndItemsRenderState state,
+		CallbackInfo callbackInfo
+	) {
+		if (ConfigFile.configData.itemHeightAnimations) {
+			return;
+		}
+		
+		state.mainHandHeight = 1f;
+		state.oldMainHandHeight = 1f;
+		state.offHandHeight = 1f;
+		state.oldOffHandHeight = 1f;
 
-		mainHandItem = Minecraft.getInstance().player.getMainHandItem();
-		offHandItem = Minecraft.getInstance().player.getOffhandItem();
+		Minecraft minecraft = Minecraft.getInstance();
 
-		callbackInfo.cancel();
+		if (minecraft.player == null) {
+			return;
+		}
+
+		state.mainHandItem = minecraft.player.getMainHandItem();
+		state.offHandItem = minecraft.player.getOffhandItem();
 	}
 }
