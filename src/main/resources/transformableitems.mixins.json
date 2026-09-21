@@ -1,11 +1,12 @@
 {
 	"required": true,
 	"package": "me.shaweel.transformableitems.mixin",
-	"compatibilityLevel": "JAVA_25",
+	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"TransformableItems",
 		"GuiOpener",
-		"ShowKeybind"
+		"ShowKeybind",
+		"TotemPopAnimation"
 	],
 	"injectors": {
 		"defaultRequire": 1
