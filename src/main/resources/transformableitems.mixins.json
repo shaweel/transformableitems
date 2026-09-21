@@ -5,7 +5,8 @@
 	"client": [
 		"TransformableItems",
 		"GuiOpener",
-		"ShowKeybind"
+		"ShowKeybind",
+		"TotemPopAnimation"
 	],
 	"injectors": {
 		"defaultRequire": 1
