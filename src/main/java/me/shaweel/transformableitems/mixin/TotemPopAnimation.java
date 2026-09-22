@@ -1,7 +1,7 @@
 package me.shaweel.transformableitems.mixin;
 
 import me.shaweel.transformableitems.ConfigFile;
-import me.shaweel.transformableitems.ConfigFile.TabConfig;
+import me.shaweel.transformableitems.ConfigFile.TotemConfig;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,14 +18,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 public class TotemPopAnimation {
 	@Inject(method = "renderItemActivationAnimation", at = @At("HEAD"))
 	private void transform(PoseStack poseStack, float f, CallbackInfo callbackInfo) {
-		TabConfig tabConfig = ConfigFile.configData.get(2);
+		TotemConfig totemConfig = ConfigFile.configData.totemConfig;
 
 		double divisor = 1.3;
 
 		poseStack.translate(
-			tabConfig.xOffset / divisor,
-			tabConfig.yOffset / divisor,
-			tabConfig.zOffset / divisor
+			totemConfig.xOffset / divisor,
+			totemConfig.yOffset / divisor,
+			0
 		);
 	}
 	@ModifyArgs(
@@ -36,10 +36,10 @@ public class TotemPopAnimation {
 		)
 	)
 	private void modifyScale(Args args) {
-		TabConfig tabConfig = ConfigFile.configData.get(2);
+		TotemConfig totemConfig = ConfigFile.configData.totemConfig;
 
-		args.set(0, (float) args.get(0) * tabConfig.xScale);
-		args.set(1, (float) args.get(1) * tabConfig.yScale);
-		args.set(2, (float) args.get(2) * tabConfig.zScale);
+		args.set(0, (float) args.get(0) * totemConfig.xScale);
+		args.set(1, (float) args.get(1) * totemConfig.yScale);
+		args.set(2, (float) args.get(2) * totemConfig.zScale);
 	}
 }
