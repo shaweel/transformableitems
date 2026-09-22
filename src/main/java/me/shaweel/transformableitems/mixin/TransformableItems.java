@@ -3,9 +3,10 @@ package me.shaweel.transformableitems.mixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import me.shaweel.transformableitems.ConfigFile;
-
+import me.shaweel.transformableitems.ConfigFile.NormalOrFoodConfig;
 
 @Mixin(ItemInHandRenderer.class)
 public class TransformableItems {
@@ -27,6 +28,10 @@ public class TransformableItems {
 	@Shadow private ItemStack mainHandItem;
 	@Shadow private ItemStack offHandItem;
 	
+	private boolean isEating(LivingEntity livingEntity) {
+		return livingEntity.isUsingItem() && livingEntity.getUseItem().getUseAnimation() == UseAnim.EAT;
+	}
+
 	@Inject(method = "renderItem", at = @At("HEAD"))
 	private void transform(
 		LivingEntity livingEntity,
@@ -38,18 +43,41 @@ public class TransformableItems {
 		int i,
 		CallbackInfo callbackInfo
 	) {
+		NormalOrFoodConfig tabConfig = isEating(livingEntity) ? ConfigFile.configData.foodConfig : ConfigFile.configData.normalConfig;
+
 		if (transformType == TransformType.FIRST_PERSON_LEFT_HAND) {
-			poseStack.translate(ConfigFile.configData.xOffset, ConfigFile.configData.yOffset, ConfigFile.configData.zOffset);
-			poseStack.scale(ConfigFile.configData.xScale, ConfigFile.configData.yScale, ConfigFile.configData.zScale);
+			poseStack.translate(
+				tabConfig.xOffset,
+				tabConfig.yOffset,
+				tabConfig.zOffset
+			);
+
+			poseStack.scale(
+				tabConfig.xScale,
+				tabConfig.yScale,
+				tabConfig.zScale
+			);
+
 		} else if (transformType == TransformType.FIRST_PERSON_RIGHT_HAND) {
-			poseStack.translate(ConfigFile.configData.xOffset * -1, ConfigFile.configData.yOffset, ConfigFile.configData.zOffset);
-			poseStack.scale(ConfigFile.configData.xScale, ConfigFile.configData.yScale, ConfigFile.configData.zScale);
-		} else return;
+			poseStack.translate(
+				tabConfig.xOffset * -1,
+				tabConfig.yOffset,
+				tabConfig.zOffset
+			);
+
+			poseStack.scale(
+				tabConfig.xScale,
+				tabConfig.yScale,
+				tabConfig.zScale
+			);
+		} else {
+			return;
+		}
 	}
 
 	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
 	private void tick(CallbackInfo callbackInfo) {
-		if (ConfigFile.configData.itemHeightAnimations) return;
+		if (ConfigFile.configData.normalConfig.itemHeightAnimations) return;
 		oMainHandHeight = 1f;
 		oOffHandHeight = 1f;
 		mainHandHeight = 1f;
