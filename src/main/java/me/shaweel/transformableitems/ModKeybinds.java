@@ -1,6 +1,7 @@
 package me.shaweel.transformableitems;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
+
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 
@@ -9,6 +10,6 @@ public class ModKeybinds {
 
 	public static void initialize() {
 		KeyMapping.Category category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("transformableitems", "transformableitems"));
-		OPEN_CONFIG_KEYBIND = new KeyMapping("key.transformableitems.open_config", GLFW.GLFW_KEY_F7, category);
+		OPEN_CONFIG_KEYBIND = new KeyMapping("key.transformableitems.open_config", InputConstants.KEY_F7, category);
 	}
 }
