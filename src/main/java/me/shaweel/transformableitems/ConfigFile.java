@@ -9,7 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraft.client.Minecraft;
 
 public class ConfigFile {
 	public static class NormalOrFoodConfig {
@@ -42,7 +42,7 @@ public class ConfigFile {
 	}
 
 	public static ConfigData configData = new ConfigData();
-	private static final Path FILE = FMLPaths.CONFIGDIR.get().resolve("transformableitems.json");
+	private static final Path FILE = Minecraft.getInstance().gameDirectory.toPath().resolve("config/transformableitems.json");
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
 	public static void save() {
