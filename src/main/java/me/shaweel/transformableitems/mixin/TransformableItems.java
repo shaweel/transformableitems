@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.UseAnim;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,7 +29,7 @@ public class TransformableItems {
 	@Shadow private ItemStack offHandItem;
 	
 	private boolean isEating(LivingEntity livingEntity) {
-		return livingEntity.isUsingItem() && livingEntity.getUseItem().getUseAnimation() == ItemUseAnimation.EAT;
+		return livingEntity.isUsingItem() && livingEntity.getUseItem().getUseAnimation() == UseAnim.EAT;
 	}
 
 	@Inject(method = "renderItem", at = @At("HEAD"))
