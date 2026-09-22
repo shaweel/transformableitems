@@ -31,8 +31,8 @@ public class ConfigFile {
 		public float xScale = 1f;
 		public float yScale = 1f;
 		public float zScale = 1f;
-		public float xOffset = 1f;
-		public float yOffset = 1f;
+		public float xOffset = 0f;
+		public float yOffset = 0f;
 	}
 
 	public static class ConfigData {
