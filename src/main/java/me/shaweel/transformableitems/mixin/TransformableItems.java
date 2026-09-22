@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import me.shaweel.transformableitems.ConfigFile;
-import me.shaweel.transformableitems.ConfigFile.TabConfig;
+import me.shaweel.transformableitems.ConfigFile.NormalOrFoodConfig;
 
 @Mixin(ItemInHandRenderer.class)
 public class TransformableItems {
@@ -42,8 +42,7 @@ public class TransformableItems {
 		int i,
 		CallbackInfo callbackInfo
 	) {
-		int index = isEating(livingEntity) ? 1 : 0;
-		TabConfig tabConfig = ConfigFile.configData.get(index);
+		NormalOrFoodConfig tabConfig = isEating(livingEntity) ? ConfigFile.configData.foodConfig : ConfigFile.configData.normalConfig;
 
 		if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
 			poseStack.translate(
@@ -77,7 +76,7 @@ public class TransformableItems {
 
 	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
 	private void tick(CallbackInfo callbackInfo) {
-		if (ConfigFile.configData.itemHeightAnimations) return;
+		if (ConfigFile.configData.normalConfig.itemHeightAnimations) return;
 		oMainHandHeight = 1f;
 		oOffHandHeight = 1f;
 		mainHandHeight = 1f;
