@@ -14,8 +14,8 @@ import net.minecraft.util.Mth;
 public class ConfigScreen extends Screen {
 	public enum OptionTypes { FLOAT_SLIDER, BOOLEAN_OPTION }
 	public static final int DONE_BUTTON_PADDING = 7;
-	public static final int TITLE_PADDING = 12;
-	public static final int TITLE_TO_TAB_PADDING = 12;
+	public static final int TITLE_PADDING = 7;
+	public static final int TITLE_TO_TAB_PADDING = 7;
 	public static final int RESET_BUTTON_WIDTH = 50;
 	public static final int DONE_BUTTON_WIDTH = 200;
 	public static final int TAB_WIDTH = 100;
@@ -39,7 +39,7 @@ public class ConfigScreen extends Screen {
 	}
 
 	private int row(int index, int rowAmount) {
-		int headerSpace = TITLE_PADDING + this.font.lineHeight;
+		int headerSpace = TITLE_PADDING + this.font.lineHeight + TITLE_TO_TAB_PADDING + WIDGET_HEIGHT;
 		int footerSpace = DONE_BUTTON_PADDING + WIDGET_HEIGHT;
 
 		int allWidgetsHeight = rowAmount * WIDGET_HEIGHT + (rowAmount - 1) * WIDGET_PADDING;
@@ -102,7 +102,7 @@ public class ConfigScreen extends Screen {
 			@Override
 			protected void updateMessage() {
 			setMessage(Component.literal(
-				String.format("%s: %.2f", name, denormalize(min, max, this.value))
+				String.format("%s: %.2f", name, Math.round(denormalize(min, max, this.value) * 100f) / 100f)
 			));
 			}
 
@@ -147,29 +147,76 @@ public class ConfigScreen extends Screen {
 		});
 	}
 
-	private void initTab() {
+	private void initNormalTab() {
 		createSlider(x(), row(0, 7), WIDGET_WIDTH, WIDGET_HEIGHT, "X Scale", MIN_SCALE, MAX_SCALE, 
-		() -> ConfigFile.configData.get(currentTab).xScale, value -> ConfigFile.configData.get(currentTab).xScale = value, DEFAULT_SCALE);
+		() -> ConfigFile.configData.normalConfig.xScale, value -> ConfigFile.configData.normalConfig.xScale = value, DEFAULT_SCALE);
 
 		createSlider(x(), row(1, 7), WIDGET_WIDTH, WIDGET_HEIGHT, "Y Scale", MIN_SCALE, MAX_SCALE, 
-		() -> ConfigFile.configData.get(currentTab).yScale, value -> ConfigFile.configData.get(currentTab).yScale = value, DEFAULT_SCALE);
+		() -> ConfigFile.configData.normalConfig.yScale, value -> ConfigFile.configData.normalConfig.yScale = value, DEFAULT_SCALE);
 
 		createSlider(x(), row(2, 7), WIDGET_WIDTH, WIDGET_HEIGHT, "Z Scale", MIN_SCALE, MAX_SCALE, 
-		() -> ConfigFile.configData.get(currentTab).zScale, value -> ConfigFile.configData.get(currentTab).zScale = value, DEFAULT_SCALE);
+		() -> ConfigFile.configData.normalConfig.zScale, value -> ConfigFile.configData.normalConfig.zScale = value, DEFAULT_SCALE);
 
 
 		createSlider(x(), row(3, 7), WIDGET_WIDTH, WIDGET_HEIGHT, "X Offset", MIN_OFFSET, MAX_OFFSET,
-		() -> ConfigFile.configData.get(currentTab).xOffset, value -> ConfigFile.configData.get(currentTab).xOffset = value, DEFAULT_OFFSET);
+		() -> ConfigFile.configData.normalConfig.xOffset, value -> ConfigFile.configData.normalConfig.xOffset = value, DEFAULT_OFFSET);
 
 		createSlider(x(), row(4, 7), WIDGET_WIDTH, WIDGET_HEIGHT, "Y Offset", MIN_OFFSET, MAX_OFFSET,
-		() -> ConfigFile.configData.get(currentTab).yOffset, value -> ConfigFile.configData.get(currentTab).yOffset = value, DEFAULT_OFFSET);
+		() -> ConfigFile.configData.normalConfig.yOffset, value -> ConfigFile.configData.normalConfig.yOffset = value, DEFAULT_OFFSET);
 
 		createSlider(x(), row(5, 7), WIDGET_WIDTH, WIDGET_HEIGHT, "Z Offset", MIN_OFFSET, MAX_OFFSET,
-		() -> ConfigFile.configData.get(currentTab).zOffset, value -> ConfigFile.configData.get(currentTab).zOffset = value, DEFAULT_OFFSET);
+		() -> ConfigFile.configData.normalConfig.zOffset, value -> ConfigFile.configData.normalConfig.zOffset = value, DEFAULT_OFFSET);
 
+		createBooleanOption(x(), row(6, 7), WIDGET_WIDTH, WIDGET_HEIGHT, "Item Height Animations",
+		() -> ConfigFile.configData.normalConfig.itemHeightAnimations, value -> ConfigFile.configData.normalConfig.itemHeightAnimations = value, true);
+	}
+
+	private void initFoodTab() {
+		createSlider(x(), row(0, 6), WIDGET_WIDTH, WIDGET_HEIGHT, "X Scale", MIN_SCALE, MAX_SCALE, 
+		() -> ConfigFile.configData.foodConfig.xScale, value -> ConfigFile.configData.foodConfig.xScale = value, DEFAULT_SCALE);
+
+		createSlider(x(), row(1, 6), WIDGET_WIDTH, WIDGET_HEIGHT, "Y Scale", MIN_SCALE, MAX_SCALE, 
+		() -> ConfigFile.configData.foodConfig.yScale, value -> ConfigFile.configData.foodConfig.yScale = value, DEFAULT_SCALE);
+
+		createSlider(x(), row(2, 6), WIDGET_WIDTH, WIDGET_HEIGHT, "Z Scale", MIN_SCALE, MAX_SCALE, 
+		() -> ConfigFile.configData.foodConfig.zScale, value -> ConfigFile.configData.foodConfig.zScale = value, DEFAULT_SCALE);
+
+
+		createSlider(x(), row(3, 6), WIDGET_WIDTH, WIDGET_HEIGHT, "X Offset", MIN_OFFSET, MAX_OFFSET,
+		() -> ConfigFile.configData.foodConfig.xOffset, value -> ConfigFile.configData.foodConfig.xOffset = value, DEFAULT_OFFSET);
+
+		createSlider(x(), row(4, 6), WIDGET_WIDTH, WIDGET_HEIGHT, "Y Offset", MIN_OFFSET, MAX_OFFSET,
+		() -> ConfigFile.configData.foodConfig.yOffset, value -> ConfigFile.configData.foodConfig.yOffset = value, DEFAULT_OFFSET);
+
+		createSlider(x(), row(5, 6), WIDGET_WIDTH, WIDGET_HEIGHT, "Z Offset", MIN_OFFSET, MAX_OFFSET,
+		() -> ConfigFile.configData.foodConfig.zOffset, value -> ConfigFile.configData.foodConfig.zOffset = value, DEFAULT_OFFSET);
+	}
+
+	private void initTotemTab() {
+		createSlider(x(), row(0, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "X Scale", MIN_SCALE, MAX_SCALE, 
+		() -> ConfigFile.configData.totemConfig.xScale, value -> ConfigFile.configData.totemConfig.xScale = value, DEFAULT_SCALE);
+
+		createSlider(x(), row(1, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "Y Scale", MIN_SCALE, MAX_SCALE, 
+		() -> ConfigFile.configData.totemConfig.yScale, value -> ConfigFile.configData.totemConfig.yScale = value, DEFAULT_SCALE);
+
+		createSlider(x(), row(2, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "Z Scale", MIN_SCALE, MAX_SCALE, 
+		() -> ConfigFile.configData.totemConfig.zScale, value -> ConfigFile.configData.totemConfig.zScale = value, DEFAULT_SCALE);
+
+
+		createSlider(x(), row(3, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "X Offset", MIN_OFFSET, MAX_OFFSET,
+		() -> ConfigFile.configData.totemConfig.xOffset, value -> ConfigFile.configData.totemConfig.xOffset = value, DEFAULT_OFFSET);
+
+		createSlider(x(), row(4, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "Y Offset", MIN_OFFSET, MAX_OFFSET,
+		() -> ConfigFile.configData.totemConfig.yOffset, value -> ConfigFile.configData.totemConfig.yOffset = value, DEFAULT_OFFSET);
+	}
+
+	private void initTab() {
 		if (currentTab == 0) {
-			createBooleanOption(x(), row(6, 7), WIDGET_WIDTH, WIDGET_HEIGHT, "Item Height Animations",
-			() -> ConfigFile.configData.itemHeightAnimations, value -> ConfigFile.configData.itemHeightAnimations = value, true);
+			initNormalTab();
+		} else if (currentTab == 1) {
+			initFoodTab();
+		} else if (currentTab == 2) {
+			initTotemTab();
 		}
 	}
 
