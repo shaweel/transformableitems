@@ -25,7 +25,7 @@ public class TotemPopAnimation {
 		float originalY = args.get(1);
 
 		args.set(0, originalX + originalX * totemConfig.xOffset);
-		args.set(1, originalY + originalY * totemConfig.yOffset);
+		args.set(1, originalY - originalY * totemConfig.yOffset);
 	}
 
 	@ModifyArgs(
