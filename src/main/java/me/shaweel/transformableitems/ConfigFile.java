@@ -58,7 +58,7 @@ public class ConfigFile {
 			if (!Files.exists(FILE)) return;
 			String jsonString = Files.readString(FILE);
 
-			JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+			JsonObject jsonObject = new JsonParser().parse(jsonString);
 
 			//Pre v1.2 JSON structure
 			if (jsonObject.has("xScale")) {
