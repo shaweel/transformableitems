@@ -13,7 +13,7 @@ public class TabButton extends Button {
 	}
 
 	@Override 
-	public boolean isHoveredOrFocused() {
+	public boolean isHovered() {
 		if (!(Minecraft.getInstance().screen instanceof ConfigScreen configScreen)) {
 			return false;
 		}
@@ -21,3 +21,4 @@ public class TabButton extends Button {
 		return configScreen.currentTab == index;
 	}
 }
+ 
