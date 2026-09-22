@@ -2,32 +2,32 @@ package me.shaweel.transformableitems.mixin;
 
 import me.shaweel.transformableitems.ConfigFile;
 import me.shaweel.transformableitems.ConfigFile.TotemConfig;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.ScreenEffectRenderer;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-@Mixin(GameRenderer.class)
+import com.mojang.blaze3d.vertex.PoseStack;
+
+
+@Mixin(ScreenEffectRenderer.class)
 public class TotemPopAnimation {
-	@ModifyArgs(
-		method = "renderItemActivationAnimation",
-		at = @At(
-			value = "INVOKE",
-			target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"
-		)
-	)
-	private void modifyTranslate(Args args) {
+	@Inject(method = "renderItemActivationAnimation", at = @At("HEAD"))
+	private void transform(PoseStack poseStack, float f, CallbackInfo callbackInfo) {
 		TotemConfig totemConfig = ConfigFile.configData.totemConfig;
 
-		float originalX = args.get(0);
-		float originalY = args.get(1);
+		double divisor = 1.3;
 
-		args.set(0, originalX + originalX * totemConfig.xOffset);
-		args.set(1, originalY - originalY * totemConfig.yOffset);
+		poseStack.translate(
+			totemConfig.xOffset / divisor,
+			totemConfig.yOffset / divisor,
+			0
+		);
 	}
-
 	@ModifyArgs(
 		method = "renderItemActivationAnimation",
 		at = @At(
