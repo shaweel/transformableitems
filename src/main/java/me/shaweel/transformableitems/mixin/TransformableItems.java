@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import me.shaweel.transformableitems.ConfigFile;
-import me.shaweel.transformableitems.ConfigFile.TabConfig;
+import me.shaweel.transformableitems.ConfigFile.NormalOrFoodConfig;
 
 @Mixin(FirstPersonHandsAndItemsRenderer.class)
 public class TransformableItems {
@@ -58,17 +58,7 @@ public class TransformableItems {
 		int lightCoords,
 		CallbackInfo callbackInfo
 	) {
-		if (!ConfigFile.configData.itemHeightAnimations) {
-			state.mainHandHeight = 1;
-			state.oldMainHandHeight = 1;
-			state.offHandHeight = 1;
-			state.oldOffHandHeight = 1;
-			state.mainHandItem = Minecraft.getInstance().player.getMainHandItem();
-			state.offHandItem = Minecraft.getInstance().player.getOffhandItem();
-		}
-
-		int index = isEating(playerState, itemStack) ? 1 : 0;
-		TabConfig tabConfig = ConfigFile.configData.get(index);
+		NormalOrFoodConfig tabConfig = isEating(playerState, itemStack) ? ConfigFile.configData.foodConfig : ConfigFile.configData.normalConfig;
 
 		if (isLeftHand(playerState, hand)) {
 			poseStack.translate(
@@ -107,9 +97,7 @@ public class TransformableItems {
 		FirstPersonHandsAndItemsRenderState state,
 		CallbackInfo callbackInfo
 	) {
-		if (ConfigFile.configData.itemHeightAnimations) {
-			return;
-		}
+		if (ConfigFile.configData.normalConfig.itemHeightAnimations) return;
 		
 		state.mainHandHeight = 1f;
 		state.oldMainHandHeight = 1f;

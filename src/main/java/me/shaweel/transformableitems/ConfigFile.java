@@ -9,11 +9,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import net.minecraft.client.Minecraft;
 import net.neoforged.fml.loading.FMLPaths;
 
 public class ConfigFile {
-	public static class TabConfig {
+	public static class NormalOrFoodConfig {
 		public float xScale = 1f;
 		public float yScale = 1f;
 		public float zScale = 1f;
@@ -22,18 +21,24 @@ public class ConfigFile {
 		public float zOffset = 0f;
 	}
 
-	public static class ConfigData {
-		public TabConfig[] tabs = {
-			new TabConfig(),
-			new TabConfig(),
-			new TabConfig()
-		};
-
+	public static class NormalConfig extends NormalOrFoodConfig {
 		public boolean itemHeightAnimations = true;
+	}
+	
+	public static class FoodConfig extends NormalOrFoodConfig {}
 
-		public TabConfig get(int index) {
-			return tabs[index];
-		}
+	public static class TotemConfig {
+		public float xScale = 1f;
+		public float yScale = 1f;
+		public float zScale = 1f;
+		public float xOffset = 1f;
+		public float yOffset = 1f;
+	}
+
+	public static class ConfigData {
+		public NormalConfig normalConfig = new NormalConfig();
+		public FoodConfig foodConfig = new FoodConfig();
+		public TotemConfig totemConfig = new TotemConfig();
 	}
 
 	public static ConfigData configData = new ConfigData();
@@ -57,13 +62,12 @@ public class ConfigFile {
 
 			//Pre v1.2 JSON structure
 			if (jsonObject.has("xScale")) {
-				TabConfig oldConfig = GSON.fromJson(jsonObject, TabConfig.class);
+				NormalConfig normalConfig = GSON.fromJson(jsonObject, NormalConfig.class);
+				FoodConfig foodConfig = GSON.fromJson(jsonObject, FoodConfig.class);
 
-				configData.tabs[0] = oldConfig;
-				configData.tabs[1] = oldConfig;
-				configData.tabs[2] = new TabConfig();
-
-				configData.itemHeightAnimations = jsonObject.get("itemHeightAnimations").getAsBoolean();
+				configData.normalConfig = normalConfig;
+				configData.foodConfig = foodConfig;
+				configData.totemConfig = new TotemConfig();
 				return;
 			}
 			
