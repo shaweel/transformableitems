@@ -3,12 +3,13 @@ package me.shaweel.transformableitems;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 
 @Mod("transformableitems")
@@ -23,10 +24,25 @@ public class TransformableItemsInitializer {
 			return true;
 		}
 	}
+	
+	private static boolean replaced = false;
 
+	public static void postInit(TickEvent.ClientTickEvent event) {
+		if (event.phase != TickEvent.Phase.END || replaced) {
+			return;
+		}
+		
+		Minecraft mc = Minecraft.getInstance();
+		
+		mc.gameRenderer = new CustomGameRenderer(mc, mc.getResourceManager());
+		mc.gameRenderer.itemRenderer = new CustomFirstPersonRenderer(mc);
+
+		replaced = true;
+	}
+	
 	public TransformableItemsInitializer() {
 		ConfigFile.load();
-		
+
 		try {
 			ModList modList = ModList.get();
 
@@ -47,8 +63,7 @@ public class TransformableItemsInitializer {
 		
 		ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (client, parent) -> new ConfigScreen());
 		MinecraftForge.EVENT_BUS.register(ModKeybinds.class);
-		MinecraftForge.EVENT_BUS.register(ItemHeightAnimations.class);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(ModelBake::onModelBake);
+		MinecraftForge.EVENT_BUS.addListener(TransformableItemsInitializer::postInit);
 		ModKeybinds.initialize();
 	}
 }
