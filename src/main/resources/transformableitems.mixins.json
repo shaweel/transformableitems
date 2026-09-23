@@ -7,7 +7,8 @@
 		"TransformableItems",
 		"GuiOpener",
 		"ShowKeybind",
-		"CategorySortOrderAccessor"
+		"CategorySortOrderAccessor",
+		"TotemPopAnimation"
 	],
 	"injectors": {
 		"defaultRequire": 1
