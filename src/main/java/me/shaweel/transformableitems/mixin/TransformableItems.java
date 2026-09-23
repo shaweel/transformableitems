@@ -2,9 +2,10 @@ package me.shaweel.transformableitems.mixin;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,6 +19,7 @@ import static com.mojang.blaze3d.platform.GlStateManager.translated;
 import static com.mojang.blaze3d.platform.GlStateManager.scalef;
 
 import me.shaweel.transformableitems.ConfigFile;
+import me.shaweel.transformableitems.ConfigFile.NormalOrFoodConfig;
 
 @Mixin(ItemInHandRenderer.class)
 public class TransformableItems {
@@ -27,6 +29,10 @@ public class TransformableItems {
 	@Shadow private float oOffHandHeight;
 	@Shadow private ItemStack mainHandItem;
 	@Shadow private ItemStack offHandItem;
+	
+	private boolean isEating(LivingEntity livingEntity) {
+		return livingEntity.isUsingItem() && livingEntity.getUseItem().getUseAnimation() == UseAnim.EAT;
+	}
 
 	private boolean pushed = false;
 
@@ -41,17 +47,42 @@ public class TransformableItems {
 		boolean bl,
 		CallbackInfo callbackInfo
 	) {
+		NormalOrFoodConfig tabConfig = isEating(livingEntity) ? ConfigFile.configData.foodConfig : ConfigFile.configData.normalConfig;
+
 		if (transformType == TransformType.FIRST_PERSON_LEFT_HAND) {
 			pushed = true;
 			pushMatrix();
-			translated(ConfigFile.configData.xOffset, ConfigFile.configData.yOffset, ConfigFile.configData.zOffset);
-			scalef(ConfigFile.configData.xScale, ConfigFile.configData.yScale, ConfigFile.configData.zScale);
+
+			translated(
+				tabConfig.xOffset,
+				tabConfig.yOffset,
+				tabConfig.zOffset
+			);
+
+			scalef(
+				tabConfig.xScale,
+				tabConfig.yScale,
+				tabConfig.zScale
+			);
+
 		} else if (transformType == TransformType.FIRST_PERSON_RIGHT_HAND) {
 			pushed = true;
 			pushMatrix();
-			translated(ConfigFile.configData.xOffset * -1, ConfigFile.configData.yOffset, ConfigFile.configData.zOffset);
-			scalef(ConfigFile.configData.xScale, ConfigFile.configData.yScale, ConfigFile.configData.zScale);
-		} else return;
+			
+			translated(
+				tabConfig.xOffset * -1,
+				tabConfig.yOffset,
+				tabConfig.zOffset
+			);
+
+			scalef(
+				tabConfig.xScale,
+				tabConfig.yScale,
+				tabConfig.zScale
+			);
+		} else {
+			return;
+		}
 	}
 
 	@Inject(
@@ -71,10 +102,9 @@ public class TransformableItems {
 		popMatrix();
 	}
 
-
 	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
 	private void tick(CallbackInfo callbackInfo) {
-		if (ConfigFile.configData.itemHeightAnimations) return;
+		if (ConfigFile.configData.normalConfig.itemHeightAnimations) return;
 		oMainHandHeight = 1f;
 		oOffHandHeight = 1f;
 		mainHandHeight = 1f;
