@@ -23,7 +23,7 @@ public class ConfigScreen extends GuiScreen {
 	public static final int RESET_BUTTON_WIDTH = 50;
 	public static final int DONE_BUTTON_WIDTH = 200;
 	public static final int TAB_WIDTH = 100;
-	public static final int TAB_AMOUNT = 3;
+	public static final int TAB_AMOUNT = 2;
 	public static final int WIDGET_WIDTH = 208;
 	public static final int WIDGET_HEIGHT = 20;
 	public static final int WIDGET_PADDING = 4;
@@ -201,31 +201,11 @@ public class ConfigScreen extends GuiScreen {
 		() -> ConfigFile.configData.foodConfig.zOffset, value -> ConfigFile.configData.foodConfig.zOffset = value, DEFAULT_OFFSET);
 	}
 
-	private void initTotemTab() {
-		createSlider(x(), row(0, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "X Scale", MIN_SCALE, MAX_SCALE, 
-		() -> ConfigFile.configData.totemConfig.xScale, value -> ConfigFile.configData.totemConfig.xScale = value, DEFAULT_SCALE);
-
-		createSlider(x(), row(1, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "Y Scale", MIN_SCALE, MAX_SCALE, 
-		() -> ConfigFile.configData.totemConfig.yScale, value -> ConfigFile.configData.totemConfig.yScale = value, DEFAULT_SCALE);
-
-		createSlider(x(), row(2, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "Z Scale", MIN_SCALE, MAX_SCALE, 
-		() -> ConfigFile.configData.totemConfig.zScale, value -> ConfigFile.configData.totemConfig.zScale = value, DEFAULT_SCALE);
-
-
-		createSlider(x(), row(3, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "X Offset", MIN_OFFSET, MAX_OFFSET,
-		() -> ConfigFile.configData.totemConfig.xOffset, value -> ConfigFile.configData.totemConfig.xOffset = value, DEFAULT_OFFSET);
-
-		createSlider(x(), row(4, 5), WIDGET_WIDTH, WIDGET_HEIGHT, "Y Offset", MIN_OFFSET, MAX_OFFSET,
-		() -> ConfigFile.configData.totemConfig.yOffset, value -> ConfigFile.configData.totemConfig.yOffset = value, DEFAULT_OFFSET);
-	}
-
 	private void initTab() {
 		if (currentTab == 0) {
 			initNormalTab();
 		} else if (currentTab == 1) {
 			initFoodTab();
-		} else if (currentTab == 2) {
-			initTotemTab();
 		}
 	}
 
@@ -235,7 +215,6 @@ public class ConfigScreen extends GuiScreen {
 
 		createTab(0, "Normal");
 		createTab(1, "Eating Animation");
-		createTab(2, "Totem Animation");
 
 		initTab();
 

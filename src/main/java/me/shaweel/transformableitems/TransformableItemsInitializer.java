@@ -18,7 +18,6 @@ public class TransformableItemsInitializer {
 		
 		Minecraft mc = Minecraft.getMinecraft();
 		
-		mc.entityRenderer = new CustomEntityRenderer(mc, mc.getResourceManager());
 		mc.entityRenderer.itemRenderer = new CustomItemRenderer(mc);
 
 		replaced = true;

@@ -28,18 +28,9 @@ public class ConfigFile {
 	
 	public static class FoodConfig extends NormalOrFoodConfig {}
 
-	public static class TotemConfig {
-		public float xScale = 1f;
-		public float yScale = 1f;
-		public float zScale = 1f;
-		public float xOffset = 0f;
-		public float yOffset = 0f;
-	}
-
 	public static class ConfigData {
 		public NormalConfig normalConfig = new NormalConfig();
 		public FoodConfig foodConfig = new FoodConfig();
-		public TotemConfig totemConfig = new TotemConfig();
 	}
 
 	public static ConfigData configData = new ConfigData();
@@ -68,7 +59,6 @@ public class ConfigFile {
 
 				configData.normalConfig = normalConfig;
 				configData.foodConfig = foodConfig;
-				configData.totemConfig = new TotemConfig();
 				return;
 			}
 			
